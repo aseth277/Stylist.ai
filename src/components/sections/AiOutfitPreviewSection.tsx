@@ -1,59 +1,27 @@
+
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { generateOutfitSuggestions, type GenerateOutfitSuggestionsOutput } from '@/ai/flows/generate-outfit-suggestions';
 import { Loader2, Wand2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useAiOutfitPreviewViewModel } from '@/viewmodels/useAiOutfitPreviewViewModel';
+import { useEffect } from 'react';
 
 const AiOutfitPreviewSection = () => {
-  const [wardrobeDescription, setWardrobeDescription] = useState('A collection of casual chic items: skinny jeans (blue, black), oversized sweaters (cream, grey), ankle boots, white sneakers, a leather jacket, and a few band t-shirts.');
-  const [avatarStyle, setAvatarStyle] = useState('realistic');
-  const [result, setResult] = useState<GenerateOutfitSuggestionsOutput | null>(null);
-  const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
+  const {
+    wardrobeDescription,
+    setWardrobeDescription,
+    avatarStyle,
+    setAvatarStyle,
+    result,
+    isPending,
+    handleSubmit,
+  } = useAiOutfitPreviewViewModel(true); // Pass true to trigger initial generation in ViewModel
 
-  const handleSubmit = () => {
-    if (!wardrobeDescription.trim()) {
-      toast({
-        title: "Wardrobe Empty?",
-        description: "Please describe your wardrobe to get suggestions.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    startTransition(async () => {
-      try {
-        setResult(null); // Clear previous result
-        const suggestion = await generateOutfitSuggestions({ wardrobeDescription, avatarStyle });
-        setResult(suggestion);
-        toast({
-          title: "Outfit Ready!",
-          description: "Here's a fresh look for you.",
-        });
-      } catch (error) {
-        console.error('Error generating outfit:', error);
-        toast({
-          title: "Uh Oh!",
-          description: "Couldn't generate an outfit. Please try again.",
-          variant: "destructive",
-        });
-        setResult(null);
-      }
-    });
-  };
-
-  // Auto-generate on initial load for demo purposes
-  useEffect(() => {
-    handleSubmit();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <section id="ai-preview" className="py-16 md:py-24 bg-background">
