@@ -35,7 +35,7 @@ const Header = () => {
   const { user, loading, onboardingComplete } = useAuth();
 
   useEffect(() => {
-    setIsMobileMenuOpen(false); 
+    setIsMobileMenuOpen(false);
   }, [pathname]);
 
   const toggleMobileMenu = () => {
@@ -50,7 +50,7 @@ const Header = () => {
       console.error('Sign out error:', error);
     }
   };
-  
+
   const NavLinkItem = ({ href, label }: { href: string; label: string }) => (
     <Link
       href={href}
@@ -107,7 +107,7 @@ const Header = () => {
             )}
             {!loading && (!user || !onboardingComplete) && (
                  <Button asChild variant="default" className="bg-primary hover:bg-primary/90 hidden md:flex">
-                    <Link href="/auth/signin">Join Waitlist / Sign In</Link>
+                    <Link href="/auth/signin">Sign In / Join Waitlist</Link>
                  </Button>
             )}
 
@@ -133,7 +133,7 @@ const Header = () => {
             )}
              {!loading && (!user || !onboardingComplete) && (
                 <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90">
-                    <Link href="/auth/signin">Join Waitlist / Sign In</Link>
+                    <Link href="/auth/signin">Sign In / Join Waitlist</Link>
                 </Button>
              )}
           </nav>
