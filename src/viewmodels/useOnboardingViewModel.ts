@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useTransition, useEffect } from 'react';
-import { saveUserOnboardingData } from '@/services/userService'; // Import the Model function
+import { saveUserOnboardingData } from '@/data-model/userService'; // Import the Model function
 
 const onboardingSchema = z.object({
   fullName: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
