@@ -13,8 +13,8 @@ export default function SignInPage() {
         <div className="mx-auto mb-4 w-fit">
           <Logo />
         </div>
-        <CardTitle className="text-2xl">Welcome Back!</CardTitle>
-        <CardDescription>Sign in to continue to MyStylist.AI</CardDescription>
+        <CardTitle className="text-2xl">Sign In or Create Account</CardTitle>
+        <CardDescription>Access your MyStylist.AI account or create a new one.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-3">
