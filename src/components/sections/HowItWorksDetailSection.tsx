@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { UploadCloud, ScanLine, UserCheck, Palette, Camera, PackageOpen } from 'lucide-react';
+import { UploadCloud, ScanLine, UserCheck, Palette, Camera, PackageOpen, Sparkles, Lightbulb, CalendarDays, User, Shirt, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -156,13 +156,5 @@ const HowItWorksDetailSection = () => {
     </section>
   );
 };
-// Helper icons - define if not already available or use lucide
-const Sparkles = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12 2l2.35 4.7L19 7.7l-4.05 3.55L16.7 16 12 13.55 7.3 16l1.75-4.75L5 7.7l4.65-1L12 2zm0 15l-1.17 2.35L9.5 22l2.02-1.77L9.8 16.5 12 18.05 14.2 16.5l-1.72 3.73L14.5 22l-1.33-2.65L12 17zM20 9l-1.18 2.35L16.5 14l2.03-1.77L16.8 8.5 19 10.05 21.2 8.5l-1.72 3.73L21.5 14l-1.32-2.65L20 9z"/></svg>;
-const Lightbulb = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>;
-const CalendarDays = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zM5 8V6h14v2H5z"/></svg>;
-const User = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>;
-const Shirt = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path d="M8.75 3A1.75 1.75 0 007 4.75V8h1V4.75a.75.75 0 01.75-.75h1.316a4.502 4.502 0 018.868 0H19.25a.75.75 0 01.75.75V8h1V4.75A1.75 1.75 0 0019.25 3h-2.58a5.978 5.978 0 00-3.178-1.895 5.978 5.978 0 00-3.178 1.895H8.75zM5 9.75A1.75 1.75 0 003.25 11.5v8A1.75 1.75 0 005 21.25h14a1.75 1.75 0 001.75-1.75v-8A1.75 1.75 0 0019 9.75H5zm2 1.5h10v7.5H7v-7.5z"/></svg>;
-const CheckCircle = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>;
-
 
 export default HowItWorksDetailSection;
