@@ -62,44 +62,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (authLoading || checkingOnboarding) return; // Still loading, wait
 
-    const isAuthPage = pathname?.startsWith('/auth');
-    const isSignInPage = pathname === '/auth/signin';
-    const isOnboardingPage = pathname === '/auth/onboarding';
+    const isAuthPage = pathname?.startsWith('/signin') || pathname?.startsWith('/onboarding') || pathname?.startsWith('/signup');
+    const isSignInPage = pathname === '/signin';
+    const isOnboardingPage = pathname === '/onboarding';
+    
+    // Define public paths that don't require authentication
+    const publicPaths = ['/', '/how-it-works', '/join-waitlist'];
+    const isPublicPage = publicPaths.includes(pathname || '') || pathname?.startsWith('/#');
+
 
     if (user) { // User is logged in
       if (onboardingComplete === false) { // Needs onboarding
         if (!isOnboardingPage) {
-          router.push('/auth/onboarding');
+          router.push('/onboarding');
         }
       } else if (onboardingComplete === true) { // Onboarding is complete
-        if (isAuthPage) { // If on an auth page (signin/onboarding), redirect to dashboard
+        if (isSignInPage || isOnboardingPage) { // If on signin or onboarding page, redirect to dashboard
           router.push('/dashboard');
         }
       }
       // If onboardingComplete is null, we're still checking, so don't redirect yet
     } else { // No user is logged in
-      if (!isSignInPage && !pathname?.startsWith('/how-it-works') && pathname !== '/' && !isAuthPage) {
-        // If not on signin, how-it-works, home, or any auth page, redirect to signin
-         router.push('/auth/signin');
-      } else if (isOnboardingPage) { // If on onboarding page without user, redirect to signin
-         router.push('/auth/signin');
+      // If user is not logged in and not on a public page or an auth page, redirect to signin
+      if (!isPublicPage && !isAuthPage) {
+         router.push('/signin');
       }
     }
   }, [user, authLoading, onboardingComplete, checkingOnboarding, router, pathname]);
 
 
   const overallLoading = authLoading || checkingOnboarding;
+  
+  // Show loader for non-public, non-auth pages during initial load
+  const publicPathsForLoader = ['/', '/how-it-works', '/join-waitlist', '/signin', '/onboarding', '/signup'];
+  const isPublicOrAuthPathForLoader = publicPathsForLoader.some(p => pathname?.startsWith(p));
 
-  if (overallLoading && !pathname?.startsWith('/auth/signin') && pathname !== '/' && !pathname?.startsWith('/how-it-works')) {
-    const isPublicPath = pathname === '/' || pathname?.startsWith('/how-it-works') || pathname?.startsWith('/join-waitlist');
-    if (!user && !isPublicPath && !pathname?.startsWith('/auth/signin')) {
-        // Show loader only if not on public paths and not on signin, while initial auth check is happening
-        return (
-            <div className="flex justify-center items-center min-h-screen bg-background">
-              <Loader2 className="h-16 w-16 text-primary animate-spin" />
-            </div>
-          );
-    }
+  if (overallLoading && !isPublicOrAuthPathForLoader) {
+    return (
+        <div className="flex justify-center items-center min-h-screen bg-background">
+          <Loader2 className="h-16 w-16 text-primary animate-spin" />
+        </div>
+      );
   }
 
 

@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 
 const onboardingSchema = z.object({
   fullName: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
@@ -97,7 +97,7 @@ export default function OnboardingForm() {
   async function onSubmit(data: OnboardingFormData) {
     if (!user) {
       toast({ title: 'Error', description: 'You are not logged in.', variant: 'destructive' });
-      router.push('/auth/signin');
+      router.push('/signin');
       return;
     }
 

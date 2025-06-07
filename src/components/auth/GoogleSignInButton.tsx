@@ -36,7 +36,7 @@ export default function GoogleSignInButton() {
         }, { merge: true });
         toast({ title: 'Welcome!', description: 'Let\'s get you set up.' });
         await checkOnboardingStatus(); // Re-check to update context
-        router.push('/auth/onboarding');
+        router.push('/onboarding');
       } else {
          // If doc exists, checkOnboardingStatus will handle redirection based on onboardingComplete field
         toast({ title: 'Welcome back!' });

@@ -45,7 +45,7 @@ const Header = () => {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.push('/auth/signin');
+      router.push('/signin');
     } catch (error) {
       console.error('Sign out error:', error);
     }
@@ -107,7 +107,7 @@ const Header = () => {
             )}
             {!loading && (!user || !onboardingComplete) && (
                  <Button asChild variant="default" className="bg-primary hover:bg-primary/90 hidden md:flex">
-                    <Link href="/auth/signin">Sign In / Join Waitlist</Link>
+                    <Link href="/signin">Sign In / Join Waitlist</Link>
                  </Button>
             )}
 
@@ -133,7 +133,7 @@ const Header = () => {
             )}
              {!loading && (!user || !onboardingComplete) && (
                 <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90">
-                    <Link href="/auth/signin">Sign In / Join Waitlist</Link>
+                    <Link href="/signin">Sign In / Join Waitlist</Link>
                 </Button>
              )}
           </nav>

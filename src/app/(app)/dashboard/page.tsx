@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.push('/auth/signin'); // Redirect to sign-in page after sign out
+      router.push('/signin'); // Redirect to sign-in page after sign out
     } catch (error) {
       console.error('Sign out error:', error);
       // Handle error (e.g., show toast)

@@ -90,7 +90,7 @@ export default function PhoneSignInForm() {
         }, { merge: true });
         toast({ title: 'Welcome!', description: 'Let\'s get you set up.' });
         await checkOnboardingStatus();
-        router.push('/auth/onboarding');
+        router.push('/onboarding');
       } else {
         toast({ title: 'Welcome back!' });
         await checkOnboardingStatus();
