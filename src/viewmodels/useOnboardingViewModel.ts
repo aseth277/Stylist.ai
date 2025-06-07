@@ -5,11 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
-import { db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+// Removed direct db/doc/setDoc imports
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useTransition, useEffect } from 'react';
+import { saveUserOnboardingData } from '@/services/userService'; // Import the Model function
 
 const onboardingSchema = z.object({
   fullName: z.string().min(2, { message: 'Full name must be at least 2 characters.' }),
@@ -73,9 +73,7 @@ export function useOnboardingViewModel(): UseOnboardingViewModelReturn {
     if (values.bodyShape) filledFields++;
     if (values.complexion) filledFields++;
     if (values.gender) filledFields++;
-    // Ensure shoppingEmail exists and is a string before checking includes
     if (values.shoppingEmail && typeof values.shoppingEmail === 'string' && values.shoppingEmail.includes('@')) filledFields++;
-    // Ensure shoppingEmail exists for consent check
     if ((values.shoppingEmail && typeof values.shoppingEmail === 'string' && values.emailConsent) || !values.shoppingEmail || values.shoppingEmail.trim() === '') filledFields++;
     
     return (filledFields / totalFields) * 100;
@@ -89,22 +87,7 @@ export function useOnboardingViewModel(): UseOnboardingViewModelReturn {
     setProgress(calculateProgress()); // Initial calculation
     return () => subscription.unsubscribe();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.watch, user]); // Added user to dependencies as defaultValues might change
-
-  // Model Interaction (saving data)
-  async function saveOnboardingData(data: OnboardingFormData): Promise<void> {
-    if (!user) {
-      throw new Error('User not logged in.');
-    }
-    const userDocRef = doc(db, 'users', user.uid);
-    await setDoc(userDocRef, {
-      ...data,
-      uid: user.uid,
-      authEmail: user.email,
-      onboardingComplete: true,
-      profileLastUpdatedAt: new Date().toISOString(),
-    }, { merge: true });
-  }
+  }, [form.watch, user]);
 
   const handleFormSubmit = async (data: OnboardingFormData) => {
     if (!user) {
@@ -115,7 +98,8 @@ export function useOnboardingViewModel(): UseOnboardingViewModelReturn {
 
     startTransition(async () => {
       try {
-        await saveOnboardingData(data); // Call to Model interaction
+        // Call to Model (userService)
+        await saveUserOnboardingData(user.uid, data, user.email);
         toast({
           title: 'Onboarding Complete!',
           description: 'Your profile has been saved. Welcome to MyStylist.AI!',
