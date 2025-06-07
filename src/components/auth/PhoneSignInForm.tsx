@@ -5,13 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { auth, db } from '@/lib/firebase';
-import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult } from 'firebase/auth';
+import { RecaptchaVerifier, signInWithPhoneNumber, type ConfirmationResult, type UserCredential } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { Phone, KeyRound, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+
+// Add recaptchaWidgetId to window declaration
+declare global {
+    interface Window {
+      recaptchaVerifier?: RecaptchaVerifier; // Made optional to reflect it might not be set initially
+      grecaptcha: any; 
+      recaptchaWidgetId?: number; 
+    }
+  }
 
 export default function PhoneSignInForm() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -24,19 +33,41 @@ export default function PhoneSignInForm() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        },
-        'expired-callback': () => {
-          // Response expired. Ask user to solve reCAPTCHA again.
-          toast({ title: "reCAPTCHA Expired", description: "Please try sending OTP again.", variant: "destructive" });
-        }
-      });
+    if (typeof window !== 'undefined') {
+      if (!window.recaptchaVerifier) {
+        const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: (response: any) => {
+            console.log('reCAPTCHA solved:', response);
+          },
+          'expired-callback': () => {
+            toast({ title: "reCAPTCHA Expired", description: "Please try sending OTP again.", variant: "destructive" });
+            if (typeof window.grecaptcha !== 'undefined' && window.recaptchaWidgetId !== undefined) {
+              try {
+                window.grecaptcha.reset(window.recaptchaWidgetId);
+              } catch (e) {
+                console.error("Error resetting reCAPTCHA on expiration:", e);
+              }
+            }
+          },
+          'error-callback': (error: any) => {
+            console.error("reCAPTCHA error-callback:", error);
+            toast({ title: "reCAPTCHA Problem", description: "There was an issue with reCAPTCHA. Please refresh and try again.", variant: "destructive" });
+          }
+        });
+        
+        verifier.render().then((widgetId) => {
+          console.log('reCAPTCHA widgetId assigned:', widgetId);
+          window.recaptchaWidgetId = widgetId;
+        }).catch(error => {
+          console.error('reCAPTCHA render error:', error);
+          toast({ title: "reCAPTCHA Setup Failed", description: "Could not set up reCAPTCHA. Please refresh the page.", variant: "destructive" });
+        });
+        window.recaptchaVerifier = verifier;
+      }
     }
-  }, [toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth, toast]); // Added auth to dependency array
   
 
   const handleSendOtp = async () => {
@@ -46,6 +77,11 @@ export default function PhoneSignInForm() {
     }
     setLoading(true);
     try {
+      if (!window.recaptchaVerifier) {
+        toast({ title: 'Verification Not Ready', description: 'reCAPTCHA verifier is not initialized. Please refresh.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
       const verifier = window.recaptchaVerifier;
       const result = await signInWithPhoneNumber(auth, phoneNumber, verifier);
       setConfirmationResult(result);
@@ -54,12 +90,16 @@ export default function PhoneSignInForm() {
     } catch (error: any) {
       console.error('Error sending OTP:', error);
       toast({ title: 'OTP Error', description: error.message || 'Failed to send OTP. Please try again.', variant: 'destructive' });
-      // Reset reCAPTCHA if it exists and there's an error
-      window.recaptchaVerifier?.render().then((widgetId: any) => {
-        if (typeof grecaptcha !== 'undefined') {
-            grecaptcha.reset(widgetId);
+      
+      if (typeof window.grecaptcha !== 'undefined' && window.recaptchaWidgetId !== undefined) {
+        try {
+            window.grecaptcha.reset(window.recaptchaWidgetId);
+        } catch (resetError) {
+            console.error("Error resetting reCAPTCHA in handleSendOtp catch:", resetError);
         }
-      });
+      } else {
+          console.warn("reCAPTCHA widgetId not available for reset in handleSendOtp catch.");
+      }
     } finally {
       setLoading(false);
     }
@@ -76,7 +116,7 @@ export default function PhoneSignInForm() {
     }
     setLoading(true);
     try {
-      const credential = await confirmationResult.confirm(otp);
+      const credential: UserCredential = await confirmationResult.confirm(otp);
       const user = credential.user;
 
       const userDocRef = doc(db, 'users', user.uid);
@@ -89,11 +129,11 @@ export default function PhoneSignInForm() {
           onboardingComplete: false,
         }, { merge: true });
         toast({ title: 'Welcome!', description: 'Let\'s get you set up.' });
-        await checkOnboardingStatus();
-        router.push('/onboarding');
+        await checkOnboardingStatus(); // This should trigger redirect via AuthContext
+        // router.push('/onboarding'); // AuthContext handles this
       } else {
         toast({ title: 'Welcome back!' });
-        await checkOnboardingStatus();
+        await checkOnboardingStatus(); // This should trigger redirect via AuthContext
       }
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
@@ -156,11 +196,3 @@ export default function PhoneSignInForm() {
     </div>
   );
 }
-
-// Add this to your global types or a specific types file if you have one
-declare global {
-    interface Window {
-      recaptchaVerifier: RecaptchaVerifier;
-      grecaptcha: any; // Or a more specific type if you import reCAPTCHA types
-    }
-  }
